@@ -71,7 +71,7 @@ void extractEmbedding( double *y, int n, int d );
   \param n      Number of data points
   \param d      Number of embedding dimensions
 */
-void extractEmbeddingText( double *y, int n, int d );
+void extractEmbeddingText( double *y, int n, int d, const char *filename);
 
 // ============================== CILK UTILITIES
 

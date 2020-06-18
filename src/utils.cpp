@@ -117,9 +117,10 @@ sparse_matrix buildPFromMTX( const char *filename ){
 }
 
 
-void extractEmbeddingText( double *y, int n, int d ){
+void extractEmbeddingText( double *y, int n, int d, const char *filename){
+  std::cout << "Saving embedding to: " << filename << std::endl;
 
-  std::ofstream f ("embedding.txt");
+  std::ofstream f (filename);
 
   if (f.is_open())
     {

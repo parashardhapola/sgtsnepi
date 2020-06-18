@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+#include <fstream>
 
 #include "sgtsne.hpp"
 
@@ -22,6 +23,8 @@ int main(int argc, char **argv)
   int opt;
   tsneparams params;
   std::string filename = "test.mtx";
+  std::string out_filename;
+  std::string ini_embed;
   coord *y;
 
   // ~~~~~~~~~~ parse inputs
@@ -42,7 +45,7 @@ int main(int argc, char **argv)
   // Shut GetOpt error messages down (return '?'): 
   opterr = 0;
 
-  while ( (opt = getopt(argc, argv, "l:d:a:m:e:h:p:")) != -1 ) { 
+  while ( (opt = getopt(argc, argv, "l:d:a:m:e:h:p:o:i:")) != -1 ) { 
     switch ( opt ) {
     case 'l':
       sscanf(optarg, "%lf", &params.lambda);
@@ -65,36 +68,31 @@ int main(int argc, char **argv)
     case 'h':
       sscanf(optarg, "%lf", &params.h);
       break;
+    case 'o':
+      out_filename = optarg;
+      break;
+    case 'i':
+      ini_embed = optarg;
+      break;
     case '?':  // unknown option...
       std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
       break;
     }
   }
 
-  // ~~~~~~~~~~ setup number of workers
-  
   if (getWorkers() != params.np && params.np > 0)
     setWorkers( params.np );
-
   params.np = getWorkers();
-
-  // ~~~~~~~~~~ load stochastic graph
   sparse_matrix P = buildPFromMTX( filename.c_str() );
   params.n = P.m;
 
-  // ~~~~~~~~~~ Run SG-t-SNE
-  y = sgtsne( P, params );
+  double* ini_embed_data = new double[params.n*params.d];
+  std::ifstream fin_embed(ini_embed.c_str());
+  for (int i = 0; i < params.n*params.d; i++) {
+      fin_embed >> ini_embed_data[i];
+  }
 
-  // ~~~~~~~~~~ export results
-  extractEmbeddingText( y, params.n, params.d );
-
-  // ~~~~~~~~~~ print instruction to show the graph
-  std::cout << std::endl << " If gnuplot is installed, issue" << std::endl << std::endl
-            << "   gnuplot -e 'set size square; plot \"embedding.txt\" with dots'" << std::endl
-            << std::endl << " to visualize the embedding" << std::endl << std::endl;
-  
-
-  free( y );
-  
+  y = sgtsne( P, params, ini_embed_data );
+  extractEmbeddingText( y, params.n, params.d, out_filename.c_str() );
+  free( y );  
 }
-

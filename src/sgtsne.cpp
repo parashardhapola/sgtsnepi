@@ -140,16 +140,12 @@ coord * sgtsne(sparse_matrix P, tsneparams params,
   coord *y = static_cast<coord *> ( malloc( params.n * params.d * sizeof(coord) ) );
 
   if (y_in == NULL){
-    
     // ----- Initialize Y
     for(int i = 0; i < params.n*params.d; i++){
       y[i] = randn() * .0001;
     }
-    
   } else {
-
     std::copy( y_in, y_in + params.n*params.d, y );
-    
   }
 
   // ~~~~~~~~~~ gradient descent
@@ -209,18 +205,18 @@ void equalizeVertex(double*  val_P,
     }
     else {
       if(Hdiff > 0) {
-	min_beta = beta;
-	if(max_beta == std::numeric_limits<double>::max() || max_beta == -std::numeric_limits<double>::max())
-	  beta *= 2.0;
-	else
-	  beta = (beta + max_beta) / 2.0;
+	       min_beta = beta;
+	       if(max_beta == std::numeric_limits<double>::max() || max_beta == -std::numeric_limits<double>::max())
+	         beta *= 2.0;
+	       else
+	         beta = (beta + max_beta) / 2.0;
       }
       else {
-	max_beta = beta;
-	if(min_beta == -std::numeric_limits<double>::max() || min_beta == std::numeric_limits<double>::max())
-	  beta /= 2.0;
-	else
-	  beta = (beta + min_beta) / 2.0;
+	     max_beta = beta;
+	     if(min_beta == -std::numeric_limits<double>::max() || min_beta == std::numeric_limits<double>::max())
+	       beta /= 2.0;
+	     else
+	       beta = (beta + min_beta) / 2.0;
       }
     }
     
